@@ -1,23 +1,7 @@
-module type Immediate = sig
-  type t [@@immediate]
-end
+module Immediate64 (Immediate : System.Immediate) (Boxed : System.Boxed) = struct
+  include System.Make (Immediate) (Boxed)
 
-module type Boxed = sig
-  type t
-end
-
-module Immediate64 (Immediate : Immediate) (Boxed : Boxed) = struct
-  type t [@@immediate64]
-  type 'a repr = Immediate : Immediate.t repr | Boxed : Boxed.t repr
-
-  let repr =
-    (* For soundness of the [@@immediate64] annotation, we ensure to use the
-       boxed representation only when not on 64-bit platforms, but we need to
-       use The Force to convince the type system of this fact. *)
-    match Sys.word_size with
-    | 64 -> (Obj.magic Immediate : t repr)
-    | 32 -> (Obj.magic Boxed : t repr)
-    | n -> Format.kasprintf failwith "Unknown word size: %d" n
+  type nonrec t = t [@@immediate64]
 end
 
 module Optint = struct

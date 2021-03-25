@@ -1,3 +1,11 @@
 (library
  (name optint)
+ (modules integer_interface int63_emul int63_native optint_emul optint_native
+   optint system)
  (public_name optint))
+
+(rule
+ (target system.ml)
+ (deps choose.ml)
+ (action
+  (run %{ocaml} %{dep:choose.ml} %{target} --sixtyfour %{arch_sixtyfour})))
